@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disclaimer - ZETFLIX</title>
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .disclaimer-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      margin-top: 120px;
+      margin-bottom: 2rem;
+    }
+    
+    .disclaimer-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .disclaimer-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    
+    .disclaimer-header .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    .disclaimer-section {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+    }
+    
+    .disclaimer-section h2 {
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .disclaimer-section p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    
+    .disclaimer-section ul {
+      color: var(--text-secondary);
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .disclaimer-section li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+    
+    .highlight-box {
+      background: rgba(229, 9, 20, 0.1);
+      border: 1px solid var(--primary-color);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .highlight-box p {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .developer-credit {
+      background: var(--gradient-primary);
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: var(--transition);
+      margin-bottom: 2rem;
+    }
+    
+    .back-home:hover {
+      background: #c5070e;
+      transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+      .disclaimer-content {
+        padding: 1rem;
+        margin-top: 100px;
+      }
+      
+      .disclaimer-header h1 {
+        font-size: 2rem;
+      }
+      
+      .disclaimer-section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <a href="main.html">
+          <img src="logo.png" alt="ZETFLIX" class="logo" />
+        </a>
+      </div>
+      
+      <div class="nav-menu">
+        <a href="main.html" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="main.html#movies" class="nav-link">
+          <i class="fas fa-film"></i>
+          <span>Movies</span>
+        </a>
+        <a href="main.html#tvshows" class="nav-link">
+          <i class="fas fa-tv"></i>
+          <span>TV Shows</span>
+        </a>
+        <a href="main.html#anime" class="nav-link">
+          <i class="fas fa-dragon"></i>
+          <span>Anime</span>
+        </a>
+      </div>
+
+      <div class="nav-search">
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Search movies, shows, anime..." />
+          <i class="fas fa-search search-icon"></i>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Disclaimer Content -->
+  <main class="disclaimer-content">
+    <a href="main.html" class="back-home">
+      <i class="fas fa-arrow-left"></i>
+      Back to Home
+    </a>
+    
+    <div class="disclaimer-header">
+      <h1>ZETFLIX Disclaimer</h1>
+      <p class="subtitle">Important information about our streaming service</p>
+    </div>
+
+    <div class="disclaimer-section">
+      <h2>
+        <i class="fas fa-info-circle"></i>
+        Welcome to ZETFLIX
+      </h2>
+      <p>
+        Welcome to Zetflix, your premier destination for free online movie streaming. We offer a vast library of Movies, TV shows, and Anime series available to watch without requiring any subscription, sign-up, or hidden fees.
+      </p>
+      <p>
+        Our extensive collection features the latest blockbusters, timeless classic films, trending TV series, popular anime, and exclusive content – all available to stream in high definition (HD) quality on any device.
+      </p>
+    </div>
+
+    <div class="disclaimer-section">
+      <h2>
+        <i class="fas fa-exclamation-triangle"></i>
+        Important Disclaimer
+      </h2>
+      <div class="highlight-box">
+        <p>
+          This website does not store any media files on its servers. Zetflix functions solely as an indexing platform, providing links to content hosted on third-party services such as YouTube, Dailymotion, Ok.ru, Vidsrc, and others.
+        </p>
+      </div>
+      
+      <h3 style="color: var(--text-primary); margin: 1.5rem 0 1rem 0;">What this means:</h3>
+      <ul>
+        <li>We do not host, upload, or store any video content on our servers</li>
+        <li>All content is streamed from legitimate third-party platforms</li>
+        <li>We act as a search engine and aggregator for publicly available content</li>
+        <li>Content availability depends on third-party sources</li>
+        <li>We are not responsible for the content hosted on external platforms</li>
+      </ul>
+    </div>
+
+    <div class="disclaimer-section">
+      <h2>
+        <i class="fas fa-shield-alt"></i>
+        Content & Copyright
+      </h2>
+      <p>
+        ZETFLIX respects intellectual property rights and operates in compliance with applicable laws. If you believe that any content linked through our platform infringes your copyright, please contact the respective hosting platform directly.
+      </p>
+      <p>
+        We encourage users to support content creators by watching content through official channels when available.
+      </p>
+    </div>
+
+    <div class="disclaimer-section">
+      <h2>
+        <i class="fas fa-users"></i>
+        User Responsibility
+      </h2>
+      <p>
+        By using ZETFLIX, you acknowledge that:
+      </p>
+      <ul>
+        <li>You are responsible for your own internet connection and data usage</li>
+        <li>You understand that content is provided by third-party sources</li>
+        <li>You will use the service in accordance with applicable laws in your jurisdiction</li>
+        <li>You will not attempt to download or redistribute content illegally</li>
+      </ul>
+    </div>
+
+    <div class="disclaimer-section">
+      <h2>
+        <i class="fas fa-globe"></i>
+        Service Availability
+      </h2>
+      <p>
+        ZETFLIX is provided "as is" without any warranties. We do not guarantee:
+      </p>
+      <ul>
+        <li>Continuous availability of the service</li>
+        <li>Availability of specific content</li>
+        <li>Quality of streams from third-party sources</li>
+        <li>Compatibility with all devices or browsers</li>
+      </ul>
+    </div>
+
+    <div class="developer-credit">
+      <i class="fas fa-code"></i>
+      Zetflix is developed by SamXerz Generative Production
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img src="logo.png" alt="ZETFLIX" class="footer-logo" />
+      </div>
+      <div class="footer-links">
+        <a href="disclaimer.html">Disclaimer</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 ZETFLIX. All rights reserved. Free streaming for everyone.</p>
+    </div>
+  </footer>
+</body>
+</html>

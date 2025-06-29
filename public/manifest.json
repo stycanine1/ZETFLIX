@@ -1,0 +1,16 @@
+{
+  "name": "ZETFLIX - Free Streaming",
+  "short_name": "ZETFLIX",
+  "description": "Stream movies, TV shows, and anime for free",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#e50914",
+  "icons": [
+    {
+      "src": "logo copy.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
