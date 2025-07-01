@@ -24,6 +24,9 @@ let visitorStats = {
   sessionStart: Date.now()
 };
 
+// Mobile menu state
+let mobileMenuOpen = false;
+
 // Initialize the application
 async function init() {
   try {
@@ -177,9 +180,53 @@ function toggleCounter() {
   }
 }
 
+// Mobile menu functions
+function toggleMobileMenu() {
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+  const navToggle = document.querySelector('.nav-toggle');
+  
+  mobileMenuOpen = !mobileMenuOpen;
+  
+  if (mobileMenuOpen) {
+    mobileMenu.classList.add('active');
+    mobileMenuOverlay.classList.add('active');
+    navToggle.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  } else {
+    mobileMenu.classList.remove('active');
+    mobileMenuOverlay.classList.remove('active');
+    navToggle.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+}
+
+function closeMobileMenu() {
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+  const navToggle = document.querySelector('.nav-toggle');
+  
+  mobileMenuOpen = false;
+  mobileMenu.classList.remove('active');
+  mobileMenuOverlay.classList.remove('active');
+  navToggle.classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+
+// Download app modal functions
+function showDownloadModal() {
+  document.getElementById('download-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDownloadModal() {
+  document.getElementById('download-modal').classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+
 // Setup navigation with smooth scrolling
 function setupNavigation() {
-  // Add click handlers to navigation links
+  // Add click handlers to navigation links (both desktop and mobile)
   const navLinks = document.querySelectorAll('.nav-link');
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
@@ -216,20 +263,24 @@ function setupNavigation() {
 
 // Navigate to specific section with smooth scrolling
 function navigateToSection(sectionName) {
+  // Close mobile menu if open
+  if (mobileMenuOpen) {
+    closeMobileMenu();
+  }
+  
   // Update URL hash
   window.history.pushState(null, null, `#${sectionName}`);
   
-  // Remove active class from all nav links
+  // Remove active class from all nav links (both desktop and mobile)
   document.querySelectorAll('.nav-link').forEach(link => {
     link.classList.remove('active');
   });
   
-  // Add active class to clicked nav link
-  const activeLink = document.querySelector(`.nav-link[href="#${sectionName}"]`) || 
-                     document.querySelector(`.nav-link[onclick*="${sectionName}"]`);
-  if (activeLink) {
-    activeLink.classList.add('active');
-  }
+  // Add active class to clicked nav link (both desktop and mobile)
+  const activeLinks = document.querySelectorAll(`.nav-link[href="#${sectionName}"]`);
+  activeLinks.forEach(link => {
+    link.classList.add('active');
+  });
   
   // Hide hero slider for section pages
   const heroSlider = document.getElementById('hero-slider');
@@ -264,6 +315,11 @@ function navigateToSection(sectionName) {
 
 // Navigate to home page
 function navigateToHome() {
+  // Close mobile menu if open
+  if (mobileMenuOpen) {
+    closeMobileMenu();
+  }
+  
   // Clear URL hash
   window.history.pushState(null, null, window.location.pathname);
   
@@ -272,12 +328,11 @@ function navigateToHome() {
     link.classList.remove('active');
   });
   
-  // Add active class to home link
-  const homeLink = document.querySelector('.nav-link[href="#home"]') || 
-                   document.querySelector('.nav-link:first-child');
-  if (homeLink) {
-    homeLink.classList.add('active');
-  }
+  // Add active class to home link (both desktop and mobile)
+  const homeLinks = document.querySelectorAll('.nav-link[href="#home"]');
+  homeLinks.forEach(link => {
+    link.classList.add('active');
+  });
   
   // Show hero slider
   const heroSlider = document.getElementById('hero-slider');
@@ -895,55 +950,63 @@ function slideContent(listId, direction) {
 
 // Search functionality
 function setupSearch() {
-  const searchInput = document.getElementById('main-search');
-  const searchDropdown = document.getElementById('search-dropdown');
+  const searchInputs = [
+    document.getElementById('main-search'),
+    document.getElementById('mobile-search')
+  ];
   
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.trim();
+  searchInputs.forEach((searchInput, index) => {
+    if (!searchInput) return;
     
-    clearTimeout(searchTimeout);
+    const searchDropdown = index === 0 ? 
+      document.getElementById('search-dropdown') : 
+      document.getElementById('mobile-search-dropdown');
     
-    if (query.length < 2) {
-      searchDropdown.classList.remove('active');
-      return;
-    }
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      
+      clearTimeout(searchTimeout);
+      
+      if (query.length < 2) {
+        searchDropdown.classList.remove('active');
+        return;
+      }
+      
+      searchTimeout = setTimeout(() => {
+        performSearch(query, searchDropdown);
+      }, 300);
+    });
     
-    searchTimeout = setTimeout(() => {
-      performSearch(query);
-    }, 300);
-  });
-  
-  // Close search dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.search-container')) {
-      searchDropdown.classList.remove('active');
-    }
+    // Close search dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-container')) {
+        searchDropdown.classList.remove('active');
+      }
+    });
   });
 }
 
 // Perform search
-async function performSearch(query) {
+async function performSearch(query, dropdown = document.getElementById('search-dropdown')) {
   try {
     const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
     const data = await res.json();
     
-    displaySearchResults(data.results || []);
+    displaySearchResults(data.results || [], dropdown);
   } catch (error) {
     console.error('Search error:', error);
   }
 }
 
 // Display search results
-function displaySearchResults(results) {
-  const searchDropdown = document.getElementById('search-dropdown');
-  
+function displaySearchResults(results, dropdown) {
   if (results.length === 0) {
-    searchDropdown.innerHTML = '<div style="padding: 1rem; text-align: center; color: #666;">No results found</div>';
-    searchDropdown.classList.add('active');
+    dropdown.innerHTML = '<div style="padding: 1rem; text-align: center; color: #666;">No results found</div>';
+    dropdown.classList.add('active');
     return;
   }
   
-  searchDropdown.innerHTML = '';
+  dropdown.innerHTML = '';
   
   results.slice(0, 8).forEach(item => {
     if (!item.poster_path) return;
@@ -952,8 +1015,18 @@ function displaySearchResults(results) {
     searchItem.className = 'search-item';
     searchItem.onclick = () => {
       showDetails(item, true); // Auto-play from search results
-      searchDropdown.classList.remove('active');
-      document.getElementById('main-search').value = '';
+      dropdown.classList.remove('active');
+      
+      // Clear both search inputs
+      const mainSearch = document.getElementById('main-search');
+      const mobileSearch = document.getElementById('mobile-search');
+      if (mainSearch) mainSearch.value = '';
+      if (mobileSearch) mobileSearch.value = '';
+      
+      // Close mobile menu if open
+      if (mobileMenuOpen) {
+        closeMobileMenu();
+      }
     };
     
     searchItem.innerHTML = `
@@ -964,16 +1037,10 @@ function displaySearchResults(results) {
       </div>
     `;
     
-    searchDropdown.appendChild(searchItem);
+    dropdown.appendChild(searchItem);
   });
   
-  searchDropdown.classList.add('active');
-}
-
-// Mobile menu toggle
-function toggleMobileMenu() {
-  const navMenu = document.querySelector('.nav-menu');
-  navMenu.classList.toggle('active');
+  dropdown.classList.add('active');
 }
 
 // Manual hero navigation functions (for future use)
@@ -995,11 +1062,18 @@ function prevHeroSlideManual() {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeModal();
+    closeDownloadModal();
+    if (mobileMenuOpen) {
+      closeMobileMenu();
+    }
   }
   
   if (e.key === '/' && !e.target.matches('input, textarea, select')) {
     e.preventDefault();
-    document.getElementById('main-search').focus();
+    const mainSearch = document.getElementById('main-search');
+    if (mainSearch) {
+      mainSearch.focus();
+    }
   }
   
   // Arrow keys for episode navigation when modal is open
@@ -1026,7 +1100,10 @@ document.addEventListener('DOMContentLoaded', init);
 
 // Handle window resize
 window.addEventListener('resize', () => {
-  // Adjust layout if needed
+  // Close mobile menu on resize to desktop
+  if (window.innerWidth > 768 && mobileMenuOpen) {
+    closeMobileMenu();
+  }
 });
 
 // Handle page visibility change (pause slider when tab is not active)
