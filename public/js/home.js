@@ -16,9 +16,20 @@ let heroSlides = [];
 let currentHeroIndex = 0;
 let heroSliderInterval;
 
+// Visitor tracking variables
+let visitorStats = {
+  liveViewers: 0,
+  totalVisitors: 0,
+  todayVisitors: 0,
+  sessionStart: Date.now()
+};
+
 // Initialize the application
 async function init() {
   try {
+    // Initialize visitor tracking
+    initVisitorTracking();
+    
     // Fetch all content
     const [movies, tvShows, anime, trending] = await Promise.all([
       fetchTrending('movie'),
@@ -64,6 +75,105 @@ async function init() {
     handleInitialHash();
   } catch (error) {
     console.error('Error initializing app:', error);
+  }
+}
+
+// Initialize visitor tracking system
+function initVisitorTracking() {
+  // Load existing stats from localStorage
+  const savedStats = localStorage.getItem('zetflix_visitor_stats');
+  if (savedStats) {
+    const parsed = JSON.parse(savedStats);
+    visitorStats.totalVisitors = parsed.totalVisitors || 0;
+    
+    // Check if it's a new day
+    const today = new Date().toDateString();
+    const lastVisit = parsed.lastVisitDate;
+    
+    if (lastVisit === today) {
+      visitorStats.todayVisitors = parsed.todayVisitors || 0;
+    } else {
+      visitorStats.todayVisitors = 0;
+    }
+  }
+  
+  // Increment counters for this visit
+  visitorStats.totalVisitors++;
+  visitorStats.todayVisitors++;
+  
+  // Save updated stats
+  saveVisitorStats();
+  
+  // Simulate live viewers (random number between 15-150)
+  visitorStats.liveViewers = Math.floor(Math.random() * 135) + 15;
+  
+  // Update display
+  updateVisitorDisplay();
+  
+  // Start live viewer simulation
+  startLiveViewerSimulation();
+  
+  // Update stats periodically
+  setInterval(() => {
+    saveVisitorStats();
+    updateVisitorDisplay();
+  }, 30000); // Every 30 seconds
+}
+
+// Save visitor stats to localStorage
+function saveVisitorStats() {
+  const statsToSave = {
+    totalVisitors: visitorStats.totalVisitors,
+    todayVisitors: visitorStats.todayVisitors,
+    lastVisitDate: new Date().toDateString(),
+    lastUpdate: Date.now()
+  };
+  
+  localStorage.setItem('zetflix_visitor_stats', JSON.stringify(statsToSave));
+}
+
+// Update visitor display
+function updateVisitorDisplay() {
+  const liveViewersEl = document.getElementById('live-viewers');
+  const totalVisitorsEl = document.getElementById('total-visitors');
+  const todayVisitorsEl = document.getElementById('today-visitors');
+  
+  if (liveViewersEl) liveViewersEl.textContent = formatNumber(visitorStats.liveViewers);
+  if (totalVisitorsEl) totalVisitorsEl.textContent = formatNumber(visitorStats.totalVisitors);
+  if (todayVisitorsEl) todayVisitorsEl.textContent = formatNumber(visitorStats.todayVisitors);
+}
+
+// Format numbers with commas
+function formatNumber(num) {
+  return num.toLocaleString();
+}
+
+// Simulate live viewer changes
+function startLiveViewerSimulation() {
+  setInterval(() => {
+    // Random change between -5 to +8 viewers
+    const change = Math.floor(Math.random() * 14) - 5;
+    visitorStats.liveViewers = Math.max(10, Math.min(200, visitorStats.liveViewers + change));
+    
+    // Update display
+    const liveViewersEl = document.getElementById('live-viewers');
+    if (liveViewersEl) {
+      liveViewersEl.textContent = formatNumber(visitorStats.liveViewers);
+    }
+  }, 8000); // Every 8 seconds
+}
+
+// Toggle visitor counter minimize/expand
+function toggleCounter() {
+  const counter = document.getElementById('visitor-counter');
+  const toggleBtn = counter.querySelector('.counter-toggle i');
+  
+  counter.classList.toggle('minimized');
+  
+  if (counter.classList.contains('minimized')) {
+    toggleBtn.className = 'fas fa-plus';
+  } else {
+    toggleBtn.className = 'fas fa-minus';
   }
 }
 

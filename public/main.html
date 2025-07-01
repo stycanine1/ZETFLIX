@@ -59,6 +59,40 @@
     </div>
   </nav>
 
+  <!-- Visitor Counter Widget -->
+  <div class="visitor-counter" id="visitor-counter">
+    <button class="counter-toggle" onclick="toggleCounter()" title="Minimize/Expand">
+      <i class="fas fa-minus"></i>
+    </button>
+    <div class="counter-header">
+      <i class="fas fa-chart-line"></i>
+      <span>Live Stats</span>
+    </div>
+    <div class="counter-stats">
+      <div class="stat-item">
+        <span class="stat-label">
+          <span class="live-indicator"></span>
+          Online Now
+        </span>
+        <span class="stat-value" id="live-viewers">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">
+          <i class="fas fa-eye"></i>
+          Total Visits
+        </span>
+        <span class="stat-value" id="total-visitors">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">
+          <i class="fas fa-calendar-day"></i>
+          Today
+        </span>
+        <span class="stat-value" id="today-visitors">0</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Hero Slider Section -->
   <section class="hero-slider" id="hero-slider">
     <div class="slider-container">
