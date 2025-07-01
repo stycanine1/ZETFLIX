@@ -16,6 +16,16 @@ let heroSlides = [];
 let currentHeroIndex = 0;
 let heroSliderInterval;
 
+// Mobile menu state
+let mobileMenuOpen = false;
+
+// User data
+let userData = {
+  name: '',
+  myList: [],
+  isFirstVisit: true
+};
+
 // Visitor tracking variables
 let visitorStats = {
   liveViewers: 0,
@@ -24,12 +34,19 @@ let visitorStats = {
   sessionStart: Date.now()
 };
 
-// Mobile menu state
-let mobileMenuOpen = false;
-
 // Initialize the application
 async function init() {
   try {
+    // Load user data first
+    loadUserData();
+    
+    // Show welcome modal for first-time visitors
+    if (userData.isFirstVisit) {
+      showWelcomeModal();
+    } else {
+      showUserGreeting();
+    }
+    
     // Initialize visitor tracking
     initVisitorTracking();
     
@@ -65,6 +82,9 @@ async function init() {
     displayContentGrid(tvShows, 'tvshows-grid');
     displayContentGrid(anime, 'anime-grid');
 
+    // Display My List
+    displayMyList();
+
     // Setup search functionality
     setupSearch();
     
@@ -79,6 +99,288 @@ async function init() {
   } catch (error) {
     console.error('Error initializing app:', error);
   }
+}
+
+// User Data Management
+function loadUserData() {
+  const savedData = localStorage.getItem('zetflix_user_data');
+  if (savedData) {
+    userData = { ...userData, ...JSON.parse(savedData) };
+  }
+}
+
+function saveUserData() {
+  localStorage.setItem('zetflix_user_data', JSON.stringify(userData));
+}
+
+function showWelcomeModal() {
+  const welcomeModal = document.getElementById('welcome-modal');
+  welcomeModal.style.display = 'flex';
+  
+  // Focus on name input
+  setTimeout(() => {
+    document.getElementById('user-name-input').focus();
+  }, 300);
+  
+  // Handle Enter key
+  document.getElementById('user-name-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      saveUserName();
+    }
+  });
+}
+
+function saveUserName() {
+  const nameInput = document.getElementById('user-name-input');
+  const name = nameInput.value.trim();
+  
+  if (name.length < 2) {
+    nameInput.style.borderColor = 'var(--primary-color)';
+    nameInput.placeholder = 'Please enter at least 2 characters';
+    return;
+  }
+  
+  userData.name = name;
+  userData.isFirstVisit = false;
+  saveUserData();
+  
+  // Hide welcome modal
+  document.getElementById('welcome-modal').style.display = 'none';
+  
+  // Show greeting
+  showUserGreeting();
+  
+  // Show welcome message
+  setTimeout(() => {
+    showWelcomeMessage();
+  }, 500);
+}
+
+function showUserGreeting() {
+  if (userData.name) {
+    const userGreeting = document.getElementById('user-greeting');
+    const userNameDisplay = document.getElementById('user-name-display');
+    
+    userNameDisplay.textContent = userData.name;
+    userGreeting.style.display = 'flex';
+    
+    // Update My List subtitle
+    const myListSubtitle = document.getElementById('mylist-subtitle');
+    myListSubtitle.textContent = `${userData.name}'s personal watchlist`;
+  }
+}
+
+function showWelcomeMessage() {
+  // Create a temporary welcome message
+  const welcomeMsg = document.createElement('div');
+  welcomeMsg.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--gradient-primary);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: var(--border-radius);
+    font-size: 1.1rem;
+    font-weight: 600;
+    z-index: 3000;
+    box-shadow: var(--shadow-heavy);
+    animation: fadeInOut 3s ease-in-out forwards;
+  `;
+  
+  welcomeMsg.innerHTML = `
+    <i class="fas fa-star" style="margin-right: 0.5rem; color: #ffd700;"></i>
+    Welcome to ZETFLIX, ${userData.name}! Enjoy unlimited streaming!
+  `;
+  
+  // Add CSS animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(welcomeMsg);
+  
+  // Remove after animation
+  setTimeout(() => {
+    if (welcomeMsg.parentNode) {
+      welcomeMsg.parentNode.removeChild(welcomeMsg);
+    }
+    if (style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+  }, 3000);
+}
+
+// My List Management
+function toggleMyList(item = currentItem) {
+  if (!item) return;
+  
+  const itemId = item.id;
+  const existingIndex = userData.myList.findIndex(listItem => listItem.id === itemId);
+  
+  if (existingIndex > -1) {
+    // Remove from list
+    userData.myList.splice(existingIndex, 1);
+  } else {
+    // Add to list
+    userData.myList.push({
+      id: item.id,
+      title: item.title || item.name,
+      poster_path: item.poster_path,
+      media_type: item.media_type || (item.title ? 'movie' : 'tv'),
+      vote_average: item.vote_average,
+      release_date: item.release_date || item.first_air_date,
+      overview: item.overview,
+      genre_ids: item.genre_ids
+    });
+  }
+  
+  saveUserData();
+  updateMyListButtons();
+  displayMyList();
+  
+  // Show feedback
+  showMyListFeedback(existingIndex > -1 ? 'removed' : 'added', item.title || item.name);
+}
+
+function updateMyListButtons() {
+  if (!currentItem) return;
+  
+  const isInList = userData.myList.some(item => item.id === currentItem.id);
+  
+  // Update modal button
+  const modalBtn = document.getElementById('modal-my-list-btn');
+  if (modalBtn) {
+    const icon = modalBtn.querySelector('i');
+    const text = modalBtn.querySelector('span');
+    
+    if (isInList) {
+      modalBtn.classList.add('added');
+      icon.className = 'fas fa-check';
+      text.textContent = 'In My List';
+    } else {
+      modalBtn.classList.remove('added');
+      icon.className = 'fas fa-plus';
+      text.textContent = 'Add to My List';
+    }
+  }
+  
+  // Update content item buttons
+  document.querySelectorAll('.my-list-btn').forEach(btn => {
+    const itemId = parseInt(btn.dataset.itemId);
+    const isItemInList = userData.myList.some(item => item.id === itemId);
+    
+    if (isItemInList) {
+      btn.classList.add('added');
+      btn.innerHTML = '<i class="fas fa-check"></i>';
+      btn.title = 'Remove from My List';
+    } else {
+      btn.classList.remove('added');
+      btn.innerHTML = '<i class="fas fa-plus"></i>';
+      btn.title = 'Add to My List';
+    }
+  });
+}
+
+function showMyListFeedback(action, title) {
+  const feedback = document.createElement('div');
+  feedback.style.cssText = `
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    z-index: 3000;
+    box-shadow: var(--shadow-heavy);
+    animation: slideInFadeOut 3s ease-in-out forwards;
+  `;
+  
+  const icon = action === 'added' ? 'fas fa-plus-circle' : 'fas fa-minus-circle';
+  const color = action === 'added' ? 'var(--primary-color)' : '#fbbf24';
+  const actionText = action === 'added' ? 'Added to' : 'Removed from';
+  
+  feedback.innerHTML = `
+    <i class="${icon}" style="color: ${color}; margin-right: 0.5rem;"></i>
+    ${actionText} My List: <strong>${title}</strong>
+  `;
+  
+  // Add CSS animation if not exists
+  if (!document.querySelector('#mylist-feedback-style')) {
+    const style = document.createElement('style');
+    style.id = 'mylist-feedback-style';
+    style.textContent = `
+      @keyframes slideInFadeOut {
+        0% { opacity: 0; transform: translateX(100%); }
+        15% { opacity: 1; transform: translateX(0); }
+        85% { opacity: 1; transform: translateX(0); }
+        100% { opacity: 0; transform: translateX(100%); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  document.body.appendChild(feedback);
+  
+  // Remove after animation
+  setTimeout(() => {
+    if (feedback.parentNode) {
+      feedback.parentNode.removeChild(feedback);
+    }
+  }, 3000);
+}
+
+function displayMyList() {
+  const container = document.getElementById('mylist-grid');
+  
+  if (userData.myList.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+        <i class="fas fa-bookmark" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <p>Your list is empty. Start adding movies and shows you want to watch!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = '';
+  
+  userData.myList.forEach(item => {
+    const contentItem = document.createElement('div');
+    contentItem.className = 'content-item';
+    contentItem.onclick = () => showDetails(item);
+    
+    contentItem.innerHTML = `
+      <img src="${IMG_URL}${item.poster_path}" alt="${item.title}" loading="lazy" />
+      <button class="my-list-btn added" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '&quot;')})" title="Remove from My List">
+        <i class="fas fa-check"></i>
+      </button>
+      <div class="content-item-overlay">
+        <div class="content-item-title">${item.title}</div>
+        <div class="content-item-meta">
+          <span class="rating">★ ${(item.vote_average / 2).toFixed(1)}</span>
+          <span class="year">${getYearFromDate(item.release_date)}</span>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(contentItem);
+  });
+}
+
+function getYearFromDate(dateString) {
+  return dateString ? new Date(dateString).getFullYear() : '';
 }
 
 // Initialize visitor tracking system
@@ -533,8 +835,13 @@ function displayContentList(items, containerId) {
     contentItem.className = 'content-item';
     contentItem.onclick = () => showDetails(item);
     
+    const isInMyList = userData.myList.some(listItem => listItem.id === item.id);
+    
     contentItem.innerHTML = `
       <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy" />
+      <button class="my-list-btn ${isInMyList ? 'added' : ''}" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '&quot;')})" title="${isInMyList ? 'Remove from My List' : 'Add to My List'}">
+        <i class="fas fa-${isInMyList ? 'check' : 'plus'}"></i>
+      </button>
       <div class="content-item-overlay">
         <div class="content-item-title">${item.title || item.name}</div>
         <div class="content-item-meta">
@@ -562,8 +869,13 @@ function displayContentGrid(items, containerId) {
     contentItem.className = 'content-item';
     contentItem.onclick = () => showDetails(item);
     
+    const isInMyList = userData.myList.some(listItem => listItem.id === item.id);
+    
     contentItem.innerHTML = `
       <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy" />
+      <button class="my-list-btn ${isInMyList ? 'added' : ''}" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '&quot;')})" title="${isInMyList ? 'Remove from My List' : 'Add to My List'}">
+        <i class="fas fa-${isInMyList ? 'check' : 'plus'}"></i>
+      </button>
       <div class="content-item-overlay">
         <div class="content-item-title">${item.title || item.name}</div>
         <div class="content-item-meta">
@@ -595,6 +907,9 @@ async function showDetails(item, autoPlay = false) {
   
   // Set media type for server selection
   currentItem.media_type = currentItem.media_type || (item.title ? 'movie' : 'tv');
+  
+  // Update My List button
+  updateMyListButtons();
   
   // Show/hide season and episode controls based on content type
   const seasonControl = document.getElementById('season-control');

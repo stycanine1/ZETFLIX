@@ -17,6 +17,21 @@
 </head>
 
 <body>
+  <!-- Welcome Modal for First-Time Visitors -->
+  <div class="welcome-modal" id="welcome-modal" style="display: none;">
+    <div class="welcome-content">
+      <h2>Welcome to ZETFLIX!</h2>
+      <p>We're excited to have you here! To personalize your experience, please tell us your name.</p>
+      <div class="name-input-group">
+        <input type="text" class="name-input" id="user-name-input" placeholder="Enter your name" maxlength="20" />
+      </div>
+      <button class="welcome-btn" id="welcome-submit" onclick="saveUserName()">
+        <i class="fas fa-user-plus"></i>
+        Get Started
+      </button>
+    </div>
+  </div>
+
   <!-- Navigation Bar -->
   <nav class="navbar">
     <div class="nav-container">
@@ -45,13 +60,24 @@
           <i class="fas fa-dragon"></i>
           <span>Anime</span>
         </a>
+        <a href="#mylist" class="nav-link">
+          <i class="fas fa-bookmark"></i>
+          <span>My List</span>
+        </a>
       </div>
 
-      <div class="nav-search">
-        <div class="search-container">
-          <input type="text" class="search-input" placeholder="Search movies, shows, anime..." id="main-search" />
-          <i class="fas fa-search search-icon"></i>
-          <div class="search-dropdown" id="search-dropdown"></div>
+      <div class="nav-actions">
+        <div class="user-greeting" id="user-greeting" style="display: none;">
+          <i class="fas fa-user-circle"></i>
+          <span>Hello, <span class="user-name" id="user-name-display"></span>!</span>
+        </div>
+
+        <div class="nav-search">
+          <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search movies, shows, anime..." id="main-search" />
+            <i class="fas fa-search search-icon"></i>
+            <div class="search-dropdown" id="search-dropdown"></div>
+          </div>
         </div>
       </div>
 
@@ -91,6 +117,10 @@
     <a href="#anime" class="nav-link" onclick="closeMobileMenu()">
       <i class="fas fa-dragon"></i>
       <span>Anime</span>
+    </a>
+    <a href="#mylist" class="nav-link" onclick="closeMobileMenu()">
+      <i class="fas fa-bookmark"></i>
+      <span>My List</span>
     </a>
     
     <div style="padding: 1rem 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 1rem;">
@@ -261,6 +291,20 @@
       </div>
       <div class="content-grid" id="anime-grid"></div>
     </section>
+
+    <!-- My List Section -->
+    <section class="content-section" id="mylist-section">
+      <div class="section-header">
+        <h1>My List</h1>
+        <p id="mylist-subtitle">Your personal watchlist</p>
+      </div>
+      <div class="content-grid" id="mylist-grid">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+          <i class="fas fa-bookmark" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+          <p>Your list is empty. Start adding movies and shows you want to watch!</p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Enhanced Video Modal -->
@@ -284,6 +328,17 @@
             <span class="modal-duration" id="modal-duration"></span>
           </div>
           <p id="modal-description"></p>
+          
+          <div class="modal-actions">
+            <button class="btn btn-primary" onclick="changeServer(); scrollToPlayer();">
+              <i class="fas fa-play"></i>
+              Watch Now
+            </button>
+            <button class="modal-my-list-btn" id="modal-my-list-btn" onclick="toggleMyList()">
+              <i class="fas fa-plus"></i>
+              <span>Add to My List</span>
+            </button>
+          </div>
         </div>
       </div>
       
