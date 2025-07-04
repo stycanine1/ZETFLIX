@@ -187,7 +187,7 @@ async function doBackgroundSync() {
   }
 }
 
-// Handle app updates
+// Handle app updates - REMOVED UPDATE FUNCTIONALITY
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

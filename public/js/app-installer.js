@@ -17,9 +17,6 @@ class ZetflixAppInstaller {
     // Setup install prompt listeners
     this.setupInstallPrompt();
     
-    // Setup app update checker
-    this.setupUpdateChecker();
-    
     // Setup offline detection
     this.setupOfflineDetection();
     
@@ -65,16 +62,6 @@ class ZetflixAppInstaller {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
         console.log('ZETFLIX Service Worker: Registered successfully', registration);
-        
-        // Check for updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              this.showUpdateAvailable();
-            }
-          });
-        });
         
         return registration;
       } catch (error) {
@@ -422,48 +409,6 @@ class ZetflixAppInstaller {
         }
       }
     });
-  }
-
-  // Setup update checker
-  setupUpdateChecker() {
-    if ('serviceWorker' in navigator && !this.isStackBlitzEnvironment()) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload();
-      });
-    }
-  }
-
-  // Show update available
-  showUpdateAvailable() {
-    const updateBar = document.createElement('div');
-    updateBar.style.cssText = `
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--primary-color);
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      z-index: 9999;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
-    `;
-    updateBar.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; max-width: 600px; margin: 0 auto;">
-        <span><i class="fas fa-download"></i> New version available!</span>
-        <button onclick="this.parentElement.parentElement.remove(); window.location.reload();" 
-                style="background: white; color: var(--primary-color); border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 600; cursor: pointer;">
-          Update Now
-        </button>
-      </div>
-    `;
-    
-    document.body.appendChild(updateBar);
-    
-    setTimeout(() => {
-      updateBar.style.transform = 'translateY(0)';
-    }, 100);
   }
 
   // Hide browser UI elements when in app mode
