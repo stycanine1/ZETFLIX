@@ -126,6 +126,16 @@
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu">
+    <!-- Get App Button at Top -->
+    <div class="mobile-app-section">
+      <a href="#" class="mobile-download-btn" onclick="zetflixInstaller.installApp(); closeMobileMenu();">
+        <i class="fas fa-download"></i>
+        <span>Download ZETFLIX App</span>
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Search Section -->
     <div class="mobile-search">
       <div class="search-container">
         <input type="text" class="search-input" placeholder="Search movies, shows, anime..." id="mobile-search" />
@@ -134,32 +144,41 @@
       </div>
     </div>
     
-    <a href="#home" class="nav-link active" onclick="closeMobileMenu()">
-      <i class="fas fa-home"></i>
-      <span>Home</span>
-    </a>
-    <a href="#movies" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-film"></i>
-      <span>Movies</span>
-    </a>
-    <a href="#tvshows" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-tv"></i>
-      <span>TV Shows</span>
-    </a>
-    <a href="#anime" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-dragon"></i>
-      <span>Anime</span>
-    </a>
-    <a href="#mylist" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-bookmark"></i>
-      <span>My List</span>
-    </a>
-    
-    <div style="padding: 1rem 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 1rem;">
-      <a href="#" class="download-app-btn" onclick="zetflixInstaller.installApp(); closeMobileMenu();" style="width: 100%; justify-content: center;">
-        <i class="fas fa-download"></i>
-        <span>Download ZETFLIX App</span>
+    <!-- Navigation Links -->
+    <div class="mobile-nav-links">
+      <a href="#home" class="nav-link active" onclick="closeMobileMenu()">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+        <i class="fas fa-chevron-right"></i>
       </a>
+      <a href="#movies" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-film"></i>
+        <span>Movies</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      <a href="#tvshows" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-tv"></i>
+        <span>TV Shows</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      <a href="#anime" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-dragon"></i>
+        <span>Anime</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      <a href="#mylist" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-bookmark"></i>
+        <span>My List</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+
+    <!-- User Info Section -->
+    <div class="mobile-user-section" id="mobile-user-section" style="display: none;">
+      <div class="mobile-user-info">
+        <i class="fas fa-user-circle"></i>
+        <span>Hello, <span id="mobile-user-name"></span>!</span>
+      </div>
     </div>
   </div>
 

@@ -160,9 +160,17 @@ function showUserGreeting() {
   if (userData.name) {
     const userGreeting = document.getElementById('user-greeting');
     const userNameDisplay = document.getElementById('user-name-display');
+    const mobileUserSection = document.getElementById('mobile-user-section');
+    const mobileUserName = document.getElementById('mobile-user-name');
     
     userNameDisplay.textContent = userData.name;
     userGreeting.style.display = 'flex';
+    
+    // Show mobile user section
+    if (mobileUserSection && mobileUserName) {
+      mobileUserName.textContent = userData.name;
+      mobileUserSection.style.display = 'block';
+    }
     
     // Update My List subtitle
     const myListSubtitle = document.getElementById('mylist-subtitle');
@@ -363,7 +371,7 @@ function displayMyList() {
     
     contentItem.innerHTML = `
       <img src="${IMG_URL}${item.poster_path}" alt="${item.title}" loading="lazy" />
-      <button class="my-list-btn added" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '&quot;')})" title="Remove from My List">
+      <button class="my-list-btn added" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '"')})" title="Remove from My List">
         <i class="fas fa-check"></i>
       </button>
       <div class="content-item-overlay">
@@ -839,7 +847,7 @@ function displayContentList(items, containerId) {
     
     contentItem.innerHTML = `
       <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy" />
-      <button class="my-list-btn ${isInMyList ? 'added' : ''}" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '&quot;')})" title="${isInMyList ? 'Remove from My List' : 'Add to My List'}">
+      <button class="my-list-btn ${isInMyList ? 'added' : ''}" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '"')})" title="${isInMyList ? 'Remove from My List' : 'Add to My List'}">
         <i class="fas fa-${isInMyList ? 'check' : 'plus'}"></i>
       </button>
       <div class="content-item-overlay">
@@ -873,7 +881,7 @@ function displayContentGrid(items, containerId) {
     
     contentItem.innerHTML = `
       <img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy" />
-      <button class="my-list-btn ${isInMyList ? 'added' : ''}" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '&quot;')})" title="${isInMyList ? 'Remove from My List' : 'Add to My List'}">
+      <button class="my-list-btn ${isInMyList ? 'added' : ''}" data-item-id="${item.id}" onclick="event.stopPropagation(); toggleMyList(${JSON.stringify(item).replace(/"/g, '"')})" title="${isInMyList ? 'Remove from My List' : 'Add to My List'}">
         <i class="fas fa-${isInMyList ? 'check' : 'plus'}"></i>
       </button>
       <div class="content-item-overlay">
