@@ -32,7 +32,6 @@
   <link rel="stylesheet" href="css/home.css">
   <link rel="preload" href="css/home.css" as="style">
   <link rel="preload" href="js/home.js" as="script">
-  <link rel="preload" href="js/app-installer.js" as="script">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
@@ -45,7 +44,6 @@
   
   <!-- Scripts -->
   <script defer src="js/home.js"></script>
-  <script defer src="js/app-installer.js"></script>
 </head>
 
 <body>
@@ -69,10 +67,6 @@
     <div class="nav-container">
       <div class="nav-brand">
         <img src="logo.png" alt="ZETFLIX" class="logo" />
-        <a href="#" class="download-app-btn" onclick="zetflixInstaller.installApp()">
-          <i class="fas fa-download"></i>
-          <span>Get App</span>
-        </a>
       </div>
       
       <div class="nav-menu">
@@ -126,15 +120,6 @@
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu">
-    <!-- Get App Button at Top -->
-    <div class="mobile-app-section">
-      <a href="#" class="mobile-download-btn" onclick="zetflixInstaller.installApp(); closeMobileMenu();">
-        <i class="fas fa-download"></i>
-        <span>Download ZETFLIX App</span>
-        <i class="fas fa-arrow-right"></i>
-      </a>
-    </div>
-
     <!-- Search Section -->
     <div class="mobile-search">
       <div class="search-container">

@@ -523,17 +523,6 @@ function closeMobileMenu() {
   document.body.style.overflow = 'auto';
 }
 
-// Download app modal functions
-function showDownloadModal() {
-  document.getElementById('download-modal').classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeDownloadModal() {
-  document.getElementById('download-modal').classList.remove('active');
-  document.body.style.overflow = 'auto';
-}
-
 // Setup navigation with smooth scrolling
 function setupNavigation() {
   // Add click handlers to navigation links (both desktop and mobile)
@@ -1385,7 +1374,6 @@ function prevHeroSlideManual() {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeModal();
-    closeDownloadModal();
     if (mobileMenuOpen) {
       closeMobileMenu();
     }
