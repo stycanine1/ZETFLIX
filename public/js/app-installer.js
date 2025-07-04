@@ -46,8 +46,21 @@ class ZetflixAppInstaller {
     }
   }
 
+  // Check if running in StackBlitz/WebContainer environment
+  isStackBlitzEnvironment() {
+    return window.location.hostname.includes('stackblitz') ||
+           window.location.hostname.includes('webcontainer') ||
+           window.location.hostname === 'localhost' && window.location.port;
+  }
+
   // Register service worker for offline functionality
   async registerServiceWorker() {
+    // Skip Service Worker registration in StackBlitz/WebContainer environment
+    if (this.isStackBlitzEnvironment()) {
+      console.warn('ZETFLIX Service Worker: Skipping registration in development environment (Service Workers not fully supported)');
+      return null;
+    }
+
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
@@ -269,11 +282,15 @@ class ZetflixAppInstaller {
 
   // Enable app-specific features
   enableAppFeatures() {
-    // Enable push notifications
-    this.setupPushNotifications();
+    // Enable push notifications (only if not in StackBlitz environment)
+    if (!this.isStackBlitzEnvironment()) {
+      this.setupPushNotifications();
+    }
     
-    // Enable background sync
-    this.setupBackgroundSync();
+    // Enable background sync (only if not in StackBlitz environment)
+    if (!this.isStackBlitzEnvironment()) {
+      this.setupBackgroundSync();
+    }
     
     // Add app-specific styles
     document.body.classList.add('app-mode');
@@ -409,7 +426,7 @@ class ZetflixAppInstaller {
 
   // Setup update checker
   setupUpdateChecker() {
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && !this.isStackBlitzEnvironment()) {
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.location.reload();
       });
