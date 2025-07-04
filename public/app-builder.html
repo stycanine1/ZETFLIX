@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZETFLIX APK Builder</title>
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .builder-container {
+      max-width: 800px;
+      margin: 120px auto 2rem;
+      padding: 2rem;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+    }
+    
+    .builder-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .builder-header h1 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .step {
+      background: var(--dark-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .step-number {
+      background: var(--primary-color);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+    
+    .download-section {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .download-btn {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.5rem;
+    }
+    
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+    
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--border-radius);
+    }
+    
+    .qr-code {
+      background: white;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      display: inline-block;
+      margin: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <a href="main.html">
+          <img src="logo.png" alt="ZETFLIX" class="logo" />
+        </a>
+      </div>
+      
+      <div class="nav-menu">
+        <a href="main.html" class="nav-link">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="main.html#movies" class="nav-link">
+          <i class="fas fa-film"></i>
+          <span>Movies</span>
+        </a>
+        <a href="main.html#tvshows" class="nav-link">
+          <i class="fas fa-tv"></i>
+          <span>TV Shows</span>
+        </a>
+        <a href="main.html#anime" class="nav-link">
+          <i class="fas fa-dragon"></i>
+          <span>Anime</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="builder-container">
+    <div class="builder-header">
+      <h1><i class="fab fa-android"></i> ZETFLIX Android App</h1>
+      <p>Get the full ZETFLIX experience on your Android device</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <h3>Progressive Web App (PWA)</h3>
+      </div>
+      <p>ZETFLIX uses Progressive Web App technology to provide a native app experience directly from your browser. No need to download from app stores!</p>
+      
+      <div class="feature-list">
+        <div class="feature-item">
+          <i class="fas fa-wifi" style="color: var(--primary-color);"></i>
+          <span>Works offline</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-rocket" style="color: var(--primary-color);"></i>
+          <span>Fast loading</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-bell" style="color: var(--primary-color);"></i>
+          <span>Push notifications</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-mobile-alt" style="color: var(--primary-color);"></i>
+          <span>Native app feel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <h3>Installation Methods</h3>
+      </div>
+      
+      <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+        <i class="fab fa-android"></i> Android Chrome:
+      </h4>
+      <ol style="margin-left: 1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+        <li>Visit ZETFLIX in Chrome browser</li>
+        <li>Tap the menu (⋮) in Chrome</li>
+        <li>Select "Add to Home screen"</li>
+        <li>Tap "Add" to install the app</li>
+        <li>Find ZETFLIX icon on your home screen</li>
+      </ol>
+      
+      <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+        <i class="fab fa-firefox"></i> Android Firefox:
+      </h4>
+      <ol style="margin-left: 1rem; line-height: 1.8; margin-bottom: 1.5rem;">
+        <li>Open ZETFLIX in Firefox</li>
+        <li>Tap the menu (⋮) in Firefox</li>
+        <li>Select "Install" option</li>
+        <li>Confirm installation</li>
+        <li>Launch from home screen</li>
+      </ol>
+      
+      <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+        <i class="fas fa-magic"></i> Automatic Install:
+      </h4>
+      <p>When you visit ZETFLIX, you'll see an "Install App" button. Simply tap it and follow the prompts!</p>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <h3>App Features</h3>
+      </div>
+      
+      <div class="feature-list">
+        <div class="feature-item">
+          <i class="fas fa-download" style="color: var(--primary-color);"></i>
+          <span>Offline content caching</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-fullscreen" style="color: var(--primary-color);"></i>
+          <span>Fullscreen experience</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-sync" style="color: var(--primary-color);"></i>
+          <span>Background sync</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-bookmark" style="color: var(--primary-color);"></i>
+          <span>My List sync</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-search" style="color: var(--primary-color);"></i>
+          <span>Enhanced search</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-keyboard" style="color: var(--primary-color);"></i>
+          <span>Keyboard shortcuts</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-shield-alt" style="color: var(--primary-color);"></i>
+          <span>Secure streaming</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-palette" style="color: var(--primary-color);"></i>
+          <span>Dark theme optimized</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">4</div>
+        <h3>System Requirements</h3>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: var(--border-radius);">
+          <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">
+            <i class="fab fa-android"></i> Android
+          </h4>
+          <ul style="margin-left: 1rem; line-height: 1.6;">
+            <li>Android 5.0+ (API 21+)</li>
+            <li>Chrome 67+ or Firefox 68+</li>
+            <li>2GB RAM minimum</li>
+            <li>100MB storage space</li>
+          </ul>
+        </div>
+        
+        <div style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: var(--border-radius);">
+          <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">
+            <i class="fas fa-wifi"></i> Network
+          </h4>
+          <ul style="margin-left: 1rem; line-height: 1.6;">
+            <li>Internet connection required</li>
+            <li>3G/4G/5G/WiFi supported</li>
+            <li>Adaptive streaming quality</li>
+            <li>Offline mode available</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="download-section">
+      <h2 style="margin-bottom: 1rem;">
+        <i class="fas fa-rocket"></i> Ready to Install?
+      </h2>
+      <p style="margin-bottom: 1.5rem; opacity: 0.9;">
+        Get the ZETFLIX app now and enjoy unlimited streaming on your Android device!
+      </p>
+      
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+        <a href="main.html" class="download-btn">
+          <i class="fas fa-globe"></i>
+          Open ZETFLIX Web
+        </a>
+        <button class="download-btn" onclick="installPWA()">
+          <i class="fas fa-download"></i>
+          Install PWA App
+        </button>
+        <button class="download-btn" onclick="showQRCode()">
+          <i class="fas fa-qrcode"></i>
+          QR Code
+        </button>
+      </div>
+      
+      <div id="qr-section" style="display: none; margin-top: 2rem;">
+        <h3>Scan to Install</h3>
+        <div class="qr-code">
+          <canvas id="qr-canvas" width="200" height="200"></canvas>
+        </div>
+        <p style="font-size: 0.9rem; opacity: 0.8;">
+          Scan this QR code with your Android device to install ZETFLIX
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function installPWA() {
+      if (window.zetflixInstaller) {
+        window.zetflixInstaller.installApp();
+      } else {
+        // Redirect to main page where installer is available
+        window.location.href = 'main.html';
+      }
+    }
+    
+    function showQRCode() {
+      const qrSection = document.getElementById('qr-section');
+      qrSection.style.display = qrSection.style.display === 'none' ? 'block' : 'none';
+      
+      if (qrSection.style.display === 'block') {
+        generateQRCode();
+      }
+    }
+    
+    function generateQRCode() {
+      const canvas = document.getElementById('qr-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Simple QR code placeholder (you can integrate a real QR code library)
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, 200, 200);
+      
+      ctx.fillStyle = '#fff';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('QR Code for', 100, 90);
+      ctx.fillText('ZETFLIX', 100, 110);
+      ctx.fillText('Installation', 100, 130);
+      
+      // Add URL text
+      ctx.font = '10px Arial';
+      ctx.fillText(window.location.origin + '/main.html', 100, 160);
+    }
+    
+    // Auto-detect if running as PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      document.body.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 2rem;">
+          <div>
+            <i class="fas fa-check-circle" style="font-size: 4rem; color: #4ade80; margin-bottom: 1rem;"></i>
+            <h2 style="margin-bottom: 1rem;">App Already Installed!</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+              You're running ZETFLIX as an installed app. Enjoy the full experience!
+            </p>
+            <a href="main.html" class="btn btn-primary">
+              <i class="fas fa-play"></i> Start Watching
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

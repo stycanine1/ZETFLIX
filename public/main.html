@@ -2,15 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>ZETFLIX - Stream Movies, TV Shows & Anime</title>
+  
+  <!-- App Icons and Manifest -->
   <link rel="icon" type="image/png" href="Screenshot_13-removebg-preview.png">
   <link rel="shortcut icon" type="image/png" href="Screenshot_13-removebg-preview.png">
   <link rel="apple-touch-icon" href="Screenshot_13-removebg-preview.png">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#e50914">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ZETFLIX">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="ZETFLIX">
+  
+  <!-- SEO and Social Meta Tags -->
+  <meta name="description" content="Stream unlimited movies, TV shows, and anime for free on ZETFLIX. Download our Android app for the best experience.">
+  <meta name="keywords" content="movies, tv shows, anime, streaming, free, android app, ZETFLIX">
+  <meta property="og:title" content="ZETFLIX - Free Movie Streaming App">
+  <meta property="og:description" content="Stream unlimited movies, TV shows, and anime for free. Download our Android app now!">
+  <meta property="og:image" content="logo.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/home.css">
   <link rel="preload" href="css/home.css" as="style">
   <link rel="preload" href="js/home.js" as="script">
-  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
@@ -21,6 +42,7 @@
   /*]]>/* */
   </script>
   
+  <!-- Scripts -->
   <script defer src="js/home.js"></script>
 </head>
 
@@ -45,10 +67,6 @@
     <div class="nav-container">
       <div class="nav-brand">
         <img src="logo.png" alt="ZETFLIX" class="logo" />
-        <a href="#" class="download-app-btn" onclick="showDownloadModal()">
-          <i class="fas fa-download"></i>
-          <span>Get App</span>
-        </a>
       </div>
       
       <div class="nav-menu">
@@ -102,6 +120,7 @@
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu">
+    <!-- Search Section -->
     <div class="mobile-search">
       <div class="search-container">
         <input type="text" class="search-input" placeholder="Search movies, shows, anime..." id="mobile-search" />
@@ -110,32 +129,41 @@
       </div>
     </div>
     
-    <a href="#home" class="nav-link active" onclick="closeMobileMenu()">
-      <i class="fas fa-home"></i>
-      <span>Home</span>
-    </a>
-    <a href="#movies" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-film"></i>
-      <span>Movies</span>
-    </a>
-    <a href="#tvshows" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-tv"></i>
-      <span>TV Shows</span>
-    </a>
-    <a href="#anime" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-dragon"></i>
-      <span>Anime</span>
-    </a>
-    <a href="#mylist" class="nav-link" onclick="closeMobileMenu()">
-      <i class="fas fa-bookmark"></i>
-      <span>My List</span>
-    </a>
-    
-    <div style="padding: 1rem 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 1rem;">
-      <a href="#" class="download-app-btn" onclick="showDownloadModal(); closeMobileMenu();" style="width: 100%; justify-content: center;">
-        <i class="fas fa-download"></i>
-        <span>Download ZETFLIX App</span>
+    <!-- Navigation Links -->
+    <div class="mobile-nav-links">
+      <a href="#home" class="nav-link active" onclick="closeMobileMenu()">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+        <i class="fas fa-chevron-right"></i>
       </a>
+      <a href="#movies" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-film"></i>
+        <span>Movies</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      <a href="#tvshows" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-tv"></i>
+        <span>TV Shows</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      <a href="#anime" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-dragon"></i>
+        <span>Anime</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      <a href="#mylist" class="nav-link" onclick="closeMobileMenu()">
+        <i class="fas fa-bookmark"></i>
+        <span>My List</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+
+    <!-- User Info Section -->
+    <div class="mobile-user-section" id="mobile-user-section" style="display: none;">
+      <div class="mobile-user-info">
+        <i class="fas fa-user-circle"></i>
+        <span>Hello, <span id="mobile-user-name"></span>!</span>
+      </div>
     </div>
   </div>
 
@@ -451,43 +479,6 @@
             <div class="loading-spinner"></div>
             <p>Loading video...</p>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Download App Modal -->
-  <div class="modal" id="download-modal">
-    <div class="modal-backdrop" onclick="closeDownloadModal()"></div>
-    <div class="modal-content" style="max-width: 500px;">
-      <button class="modal-close" onclick="closeDownloadModal()">
-        <i class="fas fa-times"></i>
-      </button>
-      
-      <div style="padding: 2rem; text-align: center;">
-        <div style="margin-bottom: 2rem;">
-          <i class="fas fa-mobile-alt" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-          <h2 style="margin-bottom: 1rem;">Get ZETFLIX App</h2>
-          <p style="color: var(--text-secondary); line-height: 1.6;">
-            Experience ZETFLIX on your mobile device with our optimized app. 
-            Get better performance, offline viewing, and exclusive mobile features.
-          </p>
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
-          <a href="#" class="btn btn-primary" style="justify-content: center; text-decoration: none;">
-            <i class="fab fa-android"></i>
-            Download for Android
-          </a>
-          <a href="#" class="btn btn-secondary" style="justify-content: center; text-decoration: none;">
-            <i class="fab fa-apple"></i>
-            Download for iOS
-          </a>
-        </div>
-        
-        <div style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: var(--border-radius); font-size: 0.9rem; color: var(--text-muted);">
-          <i class="fas fa-info-circle"></i>
-          App is currently in development. For now, enjoy the full experience on our mobile-optimized website!
         </div>
       </div>
     </div>
