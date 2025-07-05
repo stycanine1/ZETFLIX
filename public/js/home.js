@@ -10,6 +10,8 @@ let currentSeason = 1;
 let currentEpisode = 1;
 let totalSeasons = 1;
 let totalEpisodes = 1;
+let currentTVDetails = null;
+let currentSeasonDetails = null;
 
 // Hero slider variables
 let heroSlides = [];
@@ -919,7 +921,7 @@ async function showDetails(item, autoPlay = false) {
     episodeControl.style.display = 'block';
     playerInfo.style.display = 'flex';
     
-    // Fetch TV show details to get seasons
+    // Fetch TV show details to get accurate seasons
     await loadTVShowSeasons(currentItem.id);
   } else {
     // It's a movie
@@ -956,16 +958,16 @@ function scrollToPlayer() {
   }
 }
 
-// Load TV show seasons
+// Load TV show seasons with accurate data
 async function loadTVShowSeasons(tvId) {
-  const tvDetails = await fetchTVDetails(tvId);
-  if (!tvDetails || !tvDetails.seasons) return;
+  currentTVDetails = await fetchTVDetails(tvId);
+  if (!currentTVDetails || !currentTVDetails.seasons) return;
   
   const seasonSelect = document.getElementById('season-select');
   seasonSelect.innerHTML = '';
   
   // Filter out season 0 (specials) and add seasons
-  const validSeasons = tvDetails.seasons.filter(season => season.season_number > 0);
+  const validSeasons = currentTVDetails.seasons.filter(season => season.season_number > 0);
   totalSeasons = validSeasons.length;
   
   validSeasons.forEach(season => {
@@ -983,17 +985,17 @@ async function loadTVShowSeasons(tvId) {
   await loadSeasonEpisodes(tvId, currentSeason);
 }
 
-// Load episodes for a season
+// Load episodes for a season with accurate data
 async function loadSeasonEpisodes(tvId, seasonNumber) {
-  const seasonDetails = await fetchSeasonDetails(tvId, seasonNumber);
-  if (!seasonDetails || !seasonDetails.episodes) return;
+  currentSeasonDetails = await fetchSeasonDetails(tvId, seasonNumber);
+  if (!currentSeasonDetails || !currentSeasonDetails.episodes) return;
   
   const episodeSelect = document.getElementById('episode-select');
   episodeSelect.innerHTML = '';
   
-  totalEpisodes = seasonDetails.episodes.length;
+  totalEpisodes = currentSeasonDetails.episodes.length;
   
-  seasonDetails.episodes.forEach(episode => {
+  currentSeasonDetails.episodes.forEach(episode => {
     const option = document.createElement('option');
     option.value = episode.episode_number;
     option.textContent = `Episode ${episode.episode_number}: ${episode.name || 'Untitled'}`;
@@ -1084,6 +1086,99 @@ async function nextEpisode() {
   updatePlayerInfo();
   changeServer();
   setTimeout(scrollToPlayer, 500);
+}
+
+// Download content function
+function downloadContent() {
+  if (!currentItem) return;
+  
+  const type = currentItem.media_type === "movie" ? "movie" : "tv";
+  let downloadURL = "";
+  
+  if (type === "movie") {
+    // For movies, create a download link
+    downloadURL = `https://vidsrc.cc/v2/embed/movie/${currentItem.id}`;
+  } else {
+    // For TV shows, download current episode
+    downloadURL = `https://vidsrc.cc/v2/embed/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+  }
+  
+  // Show download modal
+  showDownloadModal(downloadURL);
+}
+
+// Show download modal
+function showDownloadModal(downloadURL) {
+  const modal = document.createElement('div');
+  modal.className = 'download-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4000;
+  `;
+  
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid var(--border-color);
+  `;
+  
+  const title = currentItem.media_type === 'movie' ? 
+    currentItem.title || currentItem.name :
+    `${currentItem.title || currentItem.name} - S${currentSeason}E${currentEpisode}`;
+  
+  content.innerHTML = `
+    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+      <i class="fas fa-download"></i> Download Content
+    </h3>
+    <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+      <strong>${title}</strong>
+    </p>
+    <p style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+      Click the download button below to save this content to your device.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+      <a href="${downloadURL}" download="${title.replace(/[^a-zA-Z0-9]/g, '_')}" 
+         style="background: var(--primary-color); color: white; padding: 0.75rem 1.5rem; 
+                border-radius: var(--border-radius); text-decoration: none; font-weight: 600;
+                display: inline-flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-download"></i>
+        Download Now
+      </a>
+      <button onclick="this.closest('.download-modal').remove()" 
+              style="background: var(--border-color); color: var(--text-primary); 
+                     padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
+                     cursor: pointer; font-weight: 600;">
+        Cancel
+      </button>
+    </div>
+    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.8rem;">
+      <i class="fas fa-info-circle"></i>
+      Note: Download availability depends on the source server.
+    </p>
+  `;
+  
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+  
+  // Close on backdrop click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
 }
 
 // Change video server with auto-play support

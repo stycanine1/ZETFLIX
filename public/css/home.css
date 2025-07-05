@@ -706,6 +706,17 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 
+.btn-download {
+  background: #4ade80;
+  color: white;
+}
+
+.btn-download:hover {
+  background: #22c55e;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
 /* Hero Slider Navigation (Optional - for future use) */
 .hero-nav {
   position: absolute;
@@ -1080,6 +1091,7 @@ body {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .modal-my-list-btn {
@@ -1274,6 +1286,30 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Download Modal Styles */
+.download-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4000;
+}
+
+.download-modal .modal-content {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  border: 1px solid var(--border-color);
 }
 
 /* Footer */
@@ -1488,6 +1524,11 @@ body {
 
   .welcome-content h2 {
     font-size: 1.5rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   /* Mobile Menu Adjustments */
