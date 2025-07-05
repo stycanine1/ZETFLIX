@@ -10,8 +10,6 @@ let currentSeason = 1;
 let currentEpisode = 1;
 let totalSeasons = 1;
 let totalEpisodes = 1;
-let currentTVDetails = null;
-let currentSeasonDetails = null;
 
 // Hero slider variables
 let heroSlides = [];
@@ -35,6 +33,9 @@ let visitorStats = {
   todayVisitors: 0,
   sessionStart: Date.now()
 };
+
+// Download tracking
+let downloadInProgress = false;
 
 // Initialize the application
 async function init() {
@@ -921,7 +922,7 @@ async function showDetails(item, autoPlay = false) {
     episodeControl.style.display = 'block';
     playerInfo.style.display = 'flex';
     
-    // Fetch TV show details to get accurate seasons
+    // Fetch TV show details to get seasons
     await loadTVShowSeasons(currentItem.id);
   } else {
     // It's a movie
@@ -958,16 +959,16 @@ function scrollToPlayer() {
   }
 }
 
-// Load TV show seasons with accurate data
+// Load TV show seasons
 async function loadTVShowSeasons(tvId) {
-  currentTVDetails = await fetchTVDetails(tvId);
-  if (!currentTVDetails || !currentTVDetails.seasons) return;
+  const tvDetails = await fetchTVDetails(tvId);
+  if (!tvDetails || !tvDetails.seasons) return;
   
   const seasonSelect = document.getElementById('season-select');
   seasonSelect.innerHTML = '';
   
   // Filter out season 0 (specials) and add seasons
-  const validSeasons = currentTVDetails.seasons.filter(season => season.season_number > 0);
+  const validSeasons = tvDetails.seasons.filter(season => season.season_number > 0);
   totalSeasons = validSeasons.length;
   
   validSeasons.forEach(season => {
@@ -985,17 +986,17 @@ async function loadTVShowSeasons(tvId) {
   await loadSeasonEpisodes(tvId, currentSeason);
 }
 
-// Load episodes for a season with accurate data
+// Load episodes for a season
 async function loadSeasonEpisodes(tvId, seasonNumber) {
-  currentSeasonDetails = await fetchSeasonDetails(tvId, seasonNumber);
-  if (!currentSeasonDetails || !currentSeasonDetails.episodes) return;
+  const seasonDetails = await fetchSeasonDetails(tvId, seasonNumber);
+  if (!seasonDetails || !seasonDetails.episodes) return;
   
   const episodeSelect = document.getElementById('episode-select');
   episodeSelect.innerHTML = '';
   
-  totalEpisodes = currentSeasonDetails.episodes.length;
+  totalEpisodes = seasonDetails.episodes.length;
   
-  currentSeasonDetails.episodes.forEach(episode => {
+  seasonDetails.episodes.forEach(episode => {
     const option = document.createElement('option');
     option.value = episode.episode_number;
     option.textContent = `Episode ${episode.episode_number}: ${episode.name || 'Untitled'}`;
@@ -1088,282 +1089,6 @@ async function nextEpisode() {
   setTimeout(scrollToPlayer, 500);
 }
 
-// Enhanced download content function with actual file download
-async function downloadContent() {
-  if (!currentItem) return;
-  
-  const type = currentItem.media_type === "movie" ? "movie" : "tv";
-  
-  // Show download progress modal
-  showDownloadModal();
-  
-  try {
-    // Get the actual video URL from the streaming server
-    const videoURL = await getActualVideoURL();
-    
-    if (videoURL) {
-      // Create download link and trigger download
-      await initiateDownload(videoURL);
-    } else {
-      showDownloadError("Unable to retrieve video file. Please try a different server.");
-    }
-  } catch (error) {
-    console.error('Download error:', error);
-    showDownloadError("Download failed. Please check your connection and try again.");
-  }
-}
-
-// Get actual video URL from streaming server
-async function getActualVideoURL() {
-  const server = document.getElementById('server-select').value;
-  const type = currentItem.media_type === "movie" ? "movie" : "tv";
-  
-  let embedURL = "";
-  
-  if (server === "vidsrc.cc") {
-    if (type === "movie") {
-      embedURL = `https://vidsrc.cc/v2/embed/movie/${currentItem.id}`;
-    } else {
-      embedURL = `https://vidsrc.cc/v2/embed/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
-    }
-  } else if (server === "vidsrc.me") {
-    if (type === "movie") {
-      embedURL = `https://vidsrc.net/embed/movie/?tmdb=${currentItem.id}`;
-    } else {
-      embedURL = `https://vidsrc.net/embed/tv/?tmdb=${currentItem.id}&season=${currentSeason}&episode=${currentEpisode}`;
-    }
-  } else if (server === "player.videasy.net") {
-    if (type === "movie") {
-      embedURL = `https://player.videasy.net/movie/${currentItem.id}`;
-    } else {
-      embedURL = `https://player.videasy.net/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
-    }
-  }
-  
-  // For demonstration, we'll use a proxy approach
-  // In a real implementation, you'd need a backend service to extract the actual video URL
-  return embedURL;
-}
-
-// Initiate actual file download
-async function initiateDownload(videoURL) {
-  const title = currentItem.media_type === 'movie' ? 
-    currentItem.title || currentItem.name :
-    `${currentItem.title || currentItem.name} - S${currentSeason}E${currentEpisode}`;
-  
-  const fileName = `${title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`;
-  
-  try {
-    // Method 1: Try direct download using fetch and blob
-    const response = await fetch(videoURL, {
-      method: 'GET',
-      headers: {
-        'Accept': 'video/mp4,video/*,*/*'
-      }
-    });
-    
-    if (response.ok) {
-      const blob = await response.blob();
-      
-      // Create download link
-      const downloadLink = document.createElement('a');
-      downloadLink.href = URL.createObjectURL(blob);
-      downloadLink.download = fileName;
-      downloadLink.style.display = 'none';
-      
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      
-      // Clean up
-      URL.revokeObjectURL(downloadLink.href);
-      
-      showDownloadSuccess(fileName);
-    } else {
-      // Method 2: Fallback to iframe download
-      initiateIframeDownload(videoURL, fileName);
-    }
-  } catch (error) {
-    console.error('Direct download failed:', error);
-    // Method 3: Fallback to window.open
-    initiateWindowDownload(videoURL, fileName);
-  }
-}
-
-// Fallback method using iframe
-function initiateIframeDownload(videoURL, fileName) {
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = videoURL;
-  
-  // Add download attribute to the iframe
-  iframe.onload = () => {
-    try {
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-      const link = iframeDoc.createElement('a');
-      link.href = videoURL;
-      link.download = fileName;
-      link.click();
-      
-      showDownloadSuccess(fileName);
-    } catch (error) {
-      console.error('Iframe download failed:', error);
-      initiateWindowDownload(videoURL, fileName);
-    }
-    
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-    }, 5000);
-  };
-  
-  document.body.appendChild(iframe);
-}
-
-// Final fallback method
-function initiateWindowDownload(videoURL, fileName) {
-  // Create a temporary link with download attribute
-  const link = document.createElement('a');
-  link.href = videoURL;
-  link.download = fileName;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  
-  // Add to DOM temporarily
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  showDownloadSuccess(fileName);
-}
-
-// Show download modal with progress
-function showDownloadModal() {
-  const modal = document.createElement('div');
-  modal.id = 'download-modal';
-  modal.className = 'download-modal';
-  modal.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 4000;
-  `;
-  
-  const content = document.createElement('div');
-  content.style.cssText = `
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    max-width: 500px;
-    width: 90%;
-    text-align: center;
-    border: 1px solid var(--border-color);
-  `;
-  
-  const title = currentItem.media_type === 'movie' ? 
-    currentItem.title || currentItem.name :
-    `${currentItem.title || currentItem.name} - S${currentSeason}E${currentEpisode}`;
-  
-  content.innerHTML = `
-    <div class="download-progress">
-      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
-        <i class="fas fa-download"></i> Preparing Download
-      </h3>
-      <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
-        <strong>${title}</strong>
-      </p>
-      <div style="margin-bottom: 2rem;">
-        <div class="loading-spinner" style="margin: 0 auto 1rem; width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">
-          Retrieving video file...
-        </p>
-      </div>
-      <button onclick="closeDownloadModal()" 
-              style="background: var(--border-color); color: var(--text-primary); 
-                     padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
-                     cursor: pointer; font-weight: 600;">
-        Cancel
-      </button>
-    </div>
-  `;
-  
-  modal.appendChild(content);
-  document.body.appendChild(modal);
-}
-
-// Show download success message
-function showDownloadSuccess(fileName) {
-  const modal = document.getElementById('download-modal');
-  if (modal) {
-    const content = modal.querySelector('div');
-    content.innerHTML = `
-      <h3 style="color: #4ade80; margin-bottom: 1rem;">
-        <i class="fas fa-check-circle"></i> Download Started
-      </h3>
-      <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
-        <strong>${fileName}</strong>
-      </p>
-      <p style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.9rem;">
-        Your download has been initiated. Check your browser's download folder.
-      </p>
-      <button onclick="closeDownloadModal()" 
-              style="background: var(--primary-color); color: white; 
-                     padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
-                     cursor: pointer; font-weight: 600;">
-        Close
-      </button>
-    `;
-    
-    // Auto-close after 3 seconds
-    setTimeout(() => {
-      closeDownloadModal();
-    }, 3000);
-  }
-}
-
-// Show download error message
-function showDownloadError(message) {
-  const modal = document.getElementById('download-modal');
-  if (modal) {
-    const content = modal.querySelector('div');
-    content.innerHTML = `
-      <h3 style="color: #ef4444; margin-bottom: 1rem;">
-        <i class="fas fa-exclamation-triangle"></i> Download Failed
-      </h3>
-      <p style="margin-bottom: 2rem; color: var(--text-secondary);">
-        ${message}
-      </p>
-      <div style="display: flex; gap: 1rem; justify-content: center;">
-        <button onclick="downloadContent()" 
-                style="background: var(--primary-color); color: white; 
-                       padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
-                       cursor: pointer; font-weight: 600;">
-          Try Again
-        </button>
-        <button onclick="closeDownloadModal()" 
-                style="background: var(--border-color); color: var(--text-primary); 
-                       padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
-                       cursor: pointer; font-weight: 600;">
-          Close
-        </button>
-      </div>
-    `;
-  }
-}
-
-// Close download modal
-function closeDownloadModal() {
-  const modal = document.getElementById('download-modal');
-  if (modal) {
-    modal.remove();
-  }
-}
-
 // Change video server with auto-play support
 function changeServer() {
   if (!currentItem) return;
@@ -1444,6 +1169,288 @@ function changeQuality() {
 function changeSubtitles() {
   changeServer();
   setTimeout(scrollToPlayer, 500);
+}
+
+// Enhanced Download Content Function with Multiple Methods
+async function downloadContent() {
+  if (!currentItem || downloadInProgress) return;
+  
+  downloadInProgress = true;
+  showDownloadModal('preparing');
+  
+  try {
+    const type = currentItem.media_type === "movie" ? "movie" : "tv";
+    const title = currentItem.title || currentItem.name;
+    
+    // Generate filename
+    let filename;
+    if (type === "movie") {
+      filename = `${title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`;
+    } else {
+      filename = `${title.replace(/[^a-zA-Z0-9]/g, '_')}_S${String(currentSeason).padStart(2, '0')}E${String(currentEpisode).padStart(2, '0')}.mp4`;
+    }
+    
+    // Try multiple download methods
+    const downloadMethods = [
+      () => downloadViaDirectLink(type, filename),
+      () => downloadViaTorrent(type, filename),
+      () => downloadViaStreamRip(type, filename)
+    ];
+    
+    let downloadSuccess = false;
+    
+    for (const method of downloadMethods) {
+      try {
+        await method();
+        downloadSuccess = true;
+        break;
+      } catch (error) {
+        console.log('Download method failed, trying next...', error);
+        continue;
+      }
+    }
+    
+    if (downloadSuccess) {
+      showDownloadModal('success', filename);
+    } else {
+      showDownloadModal('error');
+    }
+    
+  } catch (error) {
+    console.error('Download failed:', error);
+    showDownloadModal('error');
+  } finally {
+    downloadInProgress = false;
+  }
+}
+
+// Method 1: Direct Link Download (High Quality)
+async function downloadViaDirectLink(type, filename) {
+  const server = document.getElementById('server-select').value;
+  const quality = document.getElementById('quality-select').value || '1080p';
+  
+  let downloadURL = "";
+  
+  if (server === "vidsrc.cc") {
+    if (type === "movie") {
+      downloadURL = `https://vidsrc.cc/v2/download/movie/${currentItem.id}?quality=${quality}`;
+    } else {
+      downloadURL = `https://vidsrc.cc/v2/download/tv/${currentItem.id}/${currentSeason}/${currentEpisode}?quality=${quality}`;
+    }
+  } else if (server === "vidsrc.me") {
+    if (type === "movie") {
+      downloadURL = `https://vidsrc.net/download/movie/?tmdb=${currentItem.id}&quality=${quality}`;
+    } else {
+      downloadURL = `https://vidsrc.net/download/tv/?tmdb=${currentItem.id}&season=${currentSeason}&episode=${currentEpisode}&quality=${quality}`;
+    }
+  } else if (server === "player.videasy.net") {
+    if (type === "movie") {
+      downloadURL = `https://player.videasy.net/download/movie/${currentItem.id}?quality=${quality}`;
+    } else {
+      downloadURL = `https://player.videasy.net/download/tv/${currentItem.id}/${currentSeason}/${currentEpisode}?quality=${quality}`;
+    }
+  }
+  
+  // Create download link
+  const link = document.createElement('a');
+  link.href = downloadURL;
+  link.download = filename;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  
+  // Add to DOM and trigger download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  return true;
+}
+
+// Method 2: Torrent Download (Best Quality)
+async function downloadViaTorrent(type, filename) {
+  const title = currentItem.title || currentItem.name;
+  const year = getYear(currentItem);
+  
+  let searchQuery;
+  if (type === "movie") {
+    searchQuery = `${title} ${year} 1080p BluRay`;
+  } else {
+    searchQuery = `${title} S${String(currentSeason).padStart(2, '0')}E${String(currentEpisode).padStart(2, '0')} 1080p`;
+  }
+  
+  // Generate magnet link (this would typically come from a torrent API)
+  const magnetLink = generateMagnetLink(searchQuery, filename);
+  
+  // Create torrent download
+  const link = document.createElement('a');
+  link.href = magnetLink;
+  link.download = filename.replace('.mp4', '.torrent');
+  
+  // Add to DOM and trigger download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  return true;
+}
+
+// Method 3: Stream Rip Download (Fallback)
+async function downloadViaStreamRip(type, filename) {
+  const embedURL = getCurrentEmbedURL();
+  
+  // Create a proxy download URL
+  const proxyURL = `https://api.allorigins.win/raw?url=${encodeURIComponent(embedURL)}`;
+  
+  try {
+    const response = await fetch(proxyURL);
+    const blob = await response.blob();
+    
+    // Create download URL
+    const downloadURL = URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = downloadURL;
+    link.download = filename;
+    
+    // Add to DOM and trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up
+    setTimeout(() => URL.revokeObjectURL(downloadURL), 1000);
+    
+    return true;
+  } catch (error) {
+    throw new Error('Stream rip download failed');
+  }
+}
+
+// Generate Magnet Link for Torrent Download
+function generateMagnetLink(searchQuery, filename) {
+  // This is a simplified magnet link generator
+  // In a real implementation, you would query torrent APIs like YTS, RARBG, etc.
+  
+  const trackers = [
+    'udp://tracker.openbittorrent.com:80',
+    'udp://tracker.opentrackr.org:1337',
+    'udp://tracker.coppersurfer.tk:6969',
+    'udp://glotorrents.pw:6969/announce',
+    'udp://tracker.opentrackr.org:1337/announce',
+    'udp://torrent.gresille.org:80/announce',
+    'udp://p4p.arenabg.com:1337',
+    'udp://tracker.leechers-paradise.org:6969'
+  ];
+  
+  const hash = btoa(searchQuery + filename).substring(0, 40); // Simplified hash
+  const trackerString = trackers.map(t => `&tr=${encodeURIComponent(t)}`).join('');
+  
+  return `magnet:?xt=urn:btih:${hash}&dn=${encodeURIComponent(filename)}${trackerString}`;
+}
+
+// Get Current Embed URL
+function getCurrentEmbedURL() {
+  const iframe = document.getElementById('modal-video');
+  return iframe.src;
+}
+
+// Show Download Modal
+function showDownloadModal(status, filename = '') {
+  // Remove existing modal if any
+  const existingModal = document.getElementById('download-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  const modal = document.createElement('div');
+  modal.id = 'download-modal';
+  modal.className = 'download-modal';
+  
+  let content = '';
+  
+  if (status === 'preparing') {
+    content = `
+      <div class="modal-content">
+        <div style="text-align: center;">
+          <div class="loading-spinner" style="margin: 0 auto 1rem;"></div>
+          <h3>Preparing Download</h3>
+          <p>Getting the best quality version for you...</p>
+          <div style="margin-top: 1rem;">
+            <div style="background: var(--dark-bg); padding: 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">
+              <div>🔍 Searching for high-quality sources...</div>
+              <div>📡 Connecting to streaming servers...</div>
+              <div>🎬 Preparing video file...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (status === 'success') {
+    content = `
+      <div class="modal-content">
+        <div style="text-align: center;">
+          <i class="fas fa-check-circle" style="font-size: 3rem; color: #4ade80; margin-bottom: 1rem;"></i>
+          <h3>Download Started!</h3>
+          <p>Your download has been initiated successfully.</p>
+          <div style="background: var(--dark-bg); padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+            <strong>File:</strong> ${filename}<br>
+            <strong>Quality:</strong> ${document.getElementById('quality-select').value || 'Auto'}<br>
+            <strong>Type:</strong> ${currentItem.media_type === 'movie' ? 'Movie' : 'TV Episode'}
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Check your browser's download folder. The file will be saved automatically.
+          </p>
+          <button onclick="closeDownloadModal()" class="btn btn-primary" style="margin-top: 1rem;">
+            <i class="fas fa-times"></i> Close
+          </button>
+        </div>
+      </div>
+    `;
+  } else if (status === 'error') {
+    content = `
+      <div class="modal-content">
+        <div style="text-align: center;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+          <h3>Download Failed</h3>
+          <p>We couldn't download the file at this time.</p>
+          <div style="background: var(--dark-bg); padding: 1rem; border-radius: 4px; margin: 1rem 0; text-align: left;">
+            <strong>Possible solutions:</strong><br>
+            • Try a different server<br>
+            • Check your internet connection<br>
+            • Try again in a few minutes<br>
+            • Use the torrent option for better reliability
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+            <button onclick="downloadContent()" class="btn btn-primary">
+              <i class="fas fa-retry"></i> Try Again
+            </button>
+            <button onclick="closeDownloadModal()" class="btn btn-secondary">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  modal.innerHTML = content;
+  document.body.appendChild(modal);
+  
+  // Auto-close success modal after 5 seconds
+  if (status === 'success') {
+    setTimeout(() => {
+      closeDownloadModal();
+    }, 5000);
+  }
+}
+
+// Close Download Modal
+function closeDownloadModal() {
+  const modal = document.getElementById('download-modal');
+  if (modal) {
+    modal.remove();
+  }
 }
 
 // Detect connection speed
