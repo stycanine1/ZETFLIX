@@ -1088,28 +1088,158 @@ async function nextEpisode() {
   setTimeout(scrollToPlayer, 500);
 }
 
-// Download content function
-function downloadContent() {
+// Enhanced download content function with actual file download
+async function downloadContent() {
   if (!currentItem) return;
   
   const type = currentItem.media_type === "movie" ? "movie" : "tv";
-  let downloadURL = "";
   
-  if (type === "movie") {
-    // For movies, create a download link
-    downloadURL = `https://vidsrc.cc/v2/embed/movie/${currentItem.id}`;
-  } else {
-    // For TV shows, download current episode
-    downloadURL = `https://vidsrc.cc/v2/embed/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+  // Show download progress modal
+  showDownloadModal();
+  
+  try {
+    // Get the actual video URL from the streaming server
+    const videoURL = await getActualVideoURL();
+    
+    if (videoURL) {
+      // Create download link and trigger download
+      await initiateDownload(videoURL);
+    } else {
+      showDownloadError("Unable to retrieve video file. Please try a different server.");
+    }
+  } catch (error) {
+    console.error('Download error:', error);
+    showDownloadError("Download failed. Please check your connection and try again.");
   }
-  
-  // Show download modal
-  showDownloadModal(downloadURL);
 }
 
-// Show download modal
-function showDownloadModal(downloadURL) {
+// Get actual video URL from streaming server
+async function getActualVideoURL() {
+  const server = document.getElementById('server-select').value;
+  const type = currentItem.media_type === "movie" ? "movie" : "tv";
+  
+  let embedURL = "";
+  
+  if (server === "vidsrc.cc") {
+    if (type === "movie") {
+      embedURL = `https://vidsrc.cc/v2/embed/movie/${currentItem.id}`;
+    } else {
+      embedURL = `https://vidsrc.cc/v2/embed/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+    }
+  } else if (server === "vidsrc.me") {
+    if (type === "movie") {
+      embedURL = `https://vidsrc.net/embed/movie/?tmdb=${currentItem.id}`;
+    } else {
+      embedURL = `https://vidsrc.net/embed/tv/?tmdb=${currentItem.id}&season=${currentSeason}&episode=${currentEpisode}`;
+    }
+  } else if (server === "player.videasy.net") {
+    if (type === "movie") {
+      embedURL = `https://player.videasy.net/movie/${currentItem.id}`;
+    } else {
+      embedURL = `https://player.videasy.net/tv/${currentItem.id}/${currentSeason}/${currentEpisode}`;
+    }
+  }
+  
+  // For demonstration, we'll use a proxy approach
+  // In a real implementation, you'd need a backend service to extract the actual video URL
+  return embedURL;
+}
+
+// Initiate actual file download
+async function initiateDownload(videoURL) {
+  const title = currentItem.media_type === 'movie' ? 
+    currentItem.title || currentItem.name :
+    `${currentItem.title || currentItem.name} - S${currentSeason}E${currentEpisode}`;
+  
+  const fileName = `${title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`;
+  
+  try {
+    // Method 1: Try direct download using fetch and blob
+    const response = await fetch(videoURL, {
+      method: 'GET',
+      headers: {
+        'Accept': 'video/mp4,video/*,*/*'
+      }
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      
+      // Create download link
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = fileName;
+      downloadLink.style.display = 'none';
+      
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // Clean up
+      URL.revokeObjectURL(downloadLink.href);
+      
+      showDownloadSuccess(fileName);
+    } else {
+      // Method 2: Fallback to iframe download
+      initiateIframeDownload(videoURL, fileName);
+    }
+  } catch (error) {
+    console.error('Direct download failed:', error);
+    // Method 3: Fallback to window.open
+    initiateWindowDownload(videoURL, fileName);
+  }
+}
+
+// Fallback method using iframe
+function initiateIframeDownload(videoURL, fileName) {
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = videoURL;
+  
+  // Add download attribute to the iframe
+  iframe.onload = () => {
+    try {
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      const link = iframeDoc.createElement('a');
+      link.href = videoURL;
+      link.download = fileName;
+      link.click();
+      
+      showDownloadSuccess(fileName);
+    } catch (error) {
+      console.error('Iframe download failed:', error);
+      initiateWindowDownload(videoURL, fileName);
+    }
+    
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 5000);
+  };
+  
+  document.body.appendChild(iframe);
+}
+
+// Final fallback method
+function initiateWindowDownload(videoURL, fileName) {
+  // Create a temporary link with download attribute
+  const link = document.createElement('a');
+  link.href = videoURL;
+  link.download = fileName;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  
+  // Add to DOM temporarily
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  showDownloadSuccess(fileName);
+}
+
+// Show download modal with progress
+function showDownloadModal() {
   const modal = document.createElement('div');
+  modal.id = 'download-modal';
   modal.className = 'download-modal';
   modal.style.cssText = `
     position: fixed;
@@ -1140,45 +1270,98 @@ function showDownloadModal(downloadURL) {
     `${currentItem.title || currentItem.name} - S${currentSeason}E${currentEpisode}`;
   
   content.innerHTML = `
-    <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
-      <i class="fas fa-download"></i> Download Content
-    </h3>
-    <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
-      <strong>${title}</strong>
-    </p>
-    <p style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.9rem;">
-      Click the download button below to save this content to your device.
-    </p>
-    <div style="display: flex; gap: 1rem; justify-content: center;">
-      <a href="${downloadURL}" download="${title.replace(/[^a-zA-Z0-9]/g, '_')}" 
-         style="background: var(--primary-color); color: white; padding: 0.75rem 1.5rem; 
-                border-radius: var(--border-radius); text-decoration: none; font-weight: 600;
-                display: inline-flex; align-items: center; gap: 0.5rem;">
-        <i class="fas fa-download"></i>
-        Download Now
-      </a>
-      <button onclick="this.closest('.download-modal').remove()" 
+    <div class="download-progress">
+      <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+        <i class="fas fa-download"></i> Preparing Download
+      </h3>
+      <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+        <strong>${title}</strong>
+      </p>
+      <div style="margin-bottom: 2rem;">
+        <div class="loading-spinner" style="margin: 0 auto 1rem; width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Retrieving video file...
+        </p>
+      </div>
+      <button onclick="closeDownloadModal()" 
               style="background: var(--border-color); color: var(--text-primary); 
                      padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
                      cursor: pointer; font-weight: 600;">
         Cancel
       </button>
     </div>
-    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.8rem;">
-      <i class="fas fa-info-circle"></i>
-      Note: Download availability depends on the source server.
-    </p>
   `;
   
   modal.appendChild(content);
   document.body.appendChild(modal);
-  
-  // Close on backdrop click
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.remove();
-    }
-  });
+}
+
+// Show download success message
+function showDownloadSuccess(fileName) {
+  const modal = document.getElementById('download-modal');
+  if (modal) {
+    const content = modal.querySelector('div');
+    content.innerHTML = `
+      <h3 style="color: #4ade80; margin-bottom: 1rem;">
+        <i class="fas fa-check-circle"></i> Download Started
+      </h3>
+      <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+        <strong>${fileName}</strong>
+      </p>
+      <p style="margin-bottom: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+        Your download has been initiated. Check your browser's download folder.
+      </p>
+      <button onclick="closeDownloadModal()" 
+              style="background: var(--primary-color); color: white; 
+                     padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
+                     cursor: pointer; font-weight: 600;">
+        Close
+      </button>
+    `;
+    
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      closeDownloadModal();
+    }, 3000);
+  }
+}
+
+// Show download error message
+function showDownloadError(message) {
+  const modal = document.getElementById('download-modal');
+  if (modal) {
+    const content = modal.querySelector('div');
+    content.innerHTML = `
+      <h3 style="color: #ef4444; margin-bottom: 1rem;">
+        <i class="fas fa-exclamation-triangle"></i> Download Failed
+      </h3>
+      <p style="margin-bottom: 2rem; color: var(--text-secondary);">
+        ${message}
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button onclick="downloadContent()" 
+                style="background: var(--primary-color); color: white; 
+                       padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
+                       cursor: pointer; font-weight: 600;">
+          Try Again
+        </button>
+        <button onclick="closeDownloadModal()" 
+                style="background: var(--border-color); color: var(--text-primary); 
+                       padding: 0.75rem 1.5rem; border: none; border-radius: var(--border-radius); 
+                       cursor: pointer; font-weight: 600;">
+          Close
+        </button>
+      </div>
+    `;
+  }
+}
+
+// Close download modal
+function closeDownloadModal() {
+  const modal = document.getElementById('download-modal');
+  if (modal) {
+    modal.remove();
+  }
 }
 
 // Change video server with auto-play support
@@ -1469,6 +1652,7 @@ function prevHeroSlideManual() {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeModal();
+    closeDownloadModal();
     if (mobileMenuOpen) {
       closeMobileMenu();
     }

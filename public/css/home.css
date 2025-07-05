@@ -696,16 +696,6 @@ body {
   box-shadow: var(--shadow-medium);
 }
 
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  backdrop-filter: blur(10px);
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
 .btn-download {
   background: #4ade80;
   color: white;
@@ -715,6 +705,16 @@ body {
   background: #22c55e;
   transform: translateY(-2px);
   box-shadow: var(--shadow-medium);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Hero Slider Navigation (Optional - for future use) */
@@ -1117,6 +1117,30 @@ body {
   background: var(--primary-color);
 }
 
+/* Download Modal Styles */
+.download-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4000;
+}
+
+.download-modal .modal-content {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
 /* Enhanced Player Controls */
 .player-controls {
   background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
@@ -1286,30 +1310,6 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-/* Download Modal Styles */
-.download-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 4000;
-}
-
-.download-modal .modal-content {
-  background: var(--card-bg);
-  border-radius: var(--border-radius);
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
-  text-align: center;
-  border: 1px solid var(--border-color);
 }
 
 /* Footer */
